@@ -6,9 +6,9 @@ Solution to lockboxes problem
 
 def canUnlockAll(boxes):
     """
-    Determines whether a series of locked boxes can be opened
+    Determines if all locked boxes can be opened
     based on keys that can be attained.
-    Solution to the lockboxes problem
+    Provide a solution to the lockboxes problem
     """
     if (type(boxes)) is not list:
         return False
