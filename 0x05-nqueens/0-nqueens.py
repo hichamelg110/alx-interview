@@ -1,62 +1,66 @@
 #!/usr/bin/python3
+"""
+solution to the N Queens problem
+"""
 import sys
 
-def is_safe(board, row, col, n):
-    for i in range(col):
-        if board[row][i] == 1:
-            return False
+def solve_recursively(row, size, columns, positive_diag, negative_diag, chess_board):
+    """
+    Recursive function to find solutions
+    """
+    if row == size:
+        solution = []
+        for i in range(len(chess_board)):
+            for j in range(len(chess_board[i])):
+                if chess_board[i][j] == 1:
+                    solution.append([i, j])
+        print(solution)
+        return
 
-    for i, j in zip(range(row, -1, -1), range(col, -1, -1)):
-        if board[i][j] == 1:
-            return False
+    for col in range(size):
+        if col in columns or (row + col) in positive_diag or (row - col) in negative_diag:
+            continue
 
-    for i, j in zip(range(row, n, 1), range(col, -1, -1)):
-        if board[i][j] == 1:
-            return False
+        columns.add(col)
+        positive_diag.add(row + col)
+        negative_diag.add(row - col)
+        chess_board[row][col] = 1
 
-    return True
+        solve_recursively(row + 1, size, columns, positive_diag, negative_diag, chess_board)
 
-def solve_nqueens(n):
-    board = [[0 for _ in range(n)] for _ in range(n)]
-    solutions = []
+        columns.remove(col)
+        positive_diag.remove(row + col)
+        negative_diag.remove(row - col)
+        chess_board[row][col] = 0
 
-    def solve(col):
-        if col >= n:
-            solution = []
-            for i in range(n):
-                for j in range(n):
-                    if board[i][j] == 1:
-                        solution.append([i, j])
-            solutions.append(solution)
-            return True
+def solve_nqueens(size):
+    """
+    Solution to N Queens problem
+    Args:
+        size (int): number of queens. Must be >= 4
+    Return:
+        Prints lists representing coordinates of each
+        queen for all possible solutions
+    """
+    columns = set()
+    positive_diagonals = set()
+    negative_diagonals = set()
+    chess_board = [[0] * size for _ in range(size)]
 
-        for i in range(n):
-            if is_safe(board, i, col, n):
-                board[i][col] = 1
-                solve(col + 1)
-                board[i][col] = 0
+    solve_recursively(0, size, columns, positive_diagonals, negative_diagonals, chess_board)
 
-    solve(0)
-    return solutions
-
-def main():
-    if len(sys.argv) != 2:
+if __name__ == "__main__":
+    args = sys.argv
+    if len(args) != 2:
         print("Usage: nqueens N")
         sys.exit(1)
 
     try:
-        n = int(sys.argv[1])
+        board_size = int(args[1])
+        if board_size < 4:
+            print("N must be at least 4")
+            sys.exit(1)
+        solve_nqueens(board_size)
     except ValueError:
         print("N must be a number")
         sys.exit(1)
-
-    if n < 4:
-        print("N must be at least 4")
-        sys.exit(1)
-
-    solutions = solve_nqueens(n)
-    for solution in solutions:
-        print(solution)
-
-if __name__ == "__main__":
-    main()
