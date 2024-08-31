@@ -1,68 +1,66 @@
 #!/usr/bin/python3
 """
-Solution to the nqueens problem
+solution to the N Queens problem
 """
 import sys
 
-
-def backtrack(r, n, cols, pos, neg, board):
+def solve_recursively(row, size, columns, positive_diag, negative_diag, chess_board):
     """
-    backtrack function to find solution
+    Recursive function to find solutions
     """
-    if r == n:
-        res = []
-        for l in range(len(board)):
-            for k in range(len(board[l])):
-                if board[l][k] == 1:
-                    res.append([l, k])
-        print(res)
+    if row == size:
+        solution = []
+        for i in range(len(chess_board)):
+            for j in range(len(chess_board[i])):
+                if chess_board[i][j] == 1:
+                    solution.append([i, j])
+        print(solution)
         return
 
-    for c in range(n):
-        if c in cols or (r + c) in pos or (r - c) in neg:
+    for col in range(size):
+        if col in columns or (row + col) in positive_diag or (row - col) in negative_diag:
             continue
 
-        cols.add(c)
-        pos.add(r + c)
-        neg.add(r - c)
-        board[r][c] = 1
+        columns.add(col)
+        positive_diag.add(row + col)
+        negative_diag.add(row - col)
+        chess_board[row][col] = 1
 
-        backtrack(r+1, n, cols, pos, neg, board)
+        solve_recursively(row + 1, size, columns, positive_diag, negative_diag, chess_board)
 
-        cols.remove(c)
-        pos.remove(r + c)
-        neg.remove(r - c)
-        board[r][c] = 0
+        columns.remove(col)
+        positive_diag.remove(row + col)
+        negative_diag.remove(row - col)
+        chess_board[row][col] = 0
 
-
-def nqueens(n):
+def solve_nqueens(size):
     """
-    Solution to nqueens problem
+    Solution to N Queens problem
     Args:
-        n (int): number of queens. Must be >= 4
+        size (int): number of queens. Must be >= 4
     Return:
-        List of lists representing coordinates of each
+        Prints lists representing coordinates of each
         queen for all possible solutions
     """
-    cols = set()
-    pos_diag = set()
-    neg_diag = set()
-    board = [[0] * n for i in range(n)]
+    columns = set()
+    positive_diagonals = set()
+    negative_diagonals = set()
+    chess_board = [[0] * size for _ in range(size)]
 
-    backtrack(0, n, cols, pos_diag, neg_diag, board)
-
+    solve_recursively(0, size, columns, positive_diagonals, negative_diagonals, chess_board)
 
 if __name__ == "__main__":
-    n = sys.argv
-    if len(n) != 2:
+    args = sys.argv
+    if len(args) != 2:
         print("Usage: nqueens N")
         sys.exit(1)
+
     try:
-        nn = int(n[1])
-        if nn < 4:
+        board_size = int(args[1])
+        if board_size < 4:
             print("N must be at least 4")
             sys.exit(1)
-        nqueens(nn)
+        solve_nqueens(board_size)
     except ValueError:
         print("N must be a number")
         sys.exit(1)
