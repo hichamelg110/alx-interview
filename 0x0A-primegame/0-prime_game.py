@@ -1,43 +1,49 @@
 #!/usr/bin/python3
+"""Module for Prime Game"""
 
-def sieve_of_eratosthenes(n):
+def isWinner(rounds, nums):
     """
-    . Generate primes up to n using Sieve of Eratosthenes .
-    """
-    sieve = [True] * (n + 1)
-    sieve[0] = sieve[1] = False
-    
-    for i in range(2, int(n**0.5) + 1):
-        if sieve[i]:
-            for v in range(i*i, n + 1, i):
-                sieve[v] = False
-    
-    return sieve
+    Determines who wins the most rounds.
 
-def isWinner(x, nums):
+    Args:
+        rounds (int): Number of rounds.
+        nums (list): List where each integer represents the size of the set.
+
+    Returns:
+        str: "Ben" or "Maria" if one wins the most rounds, or None if tied.
     """
-    . Determine Prime Game winner for x rounds with given n values .
-    """
-    if not nums or x < 1:
+    if rounds <= 0 or nums is None or rounds != len(nums):
         return None
-    
-    max_n = max(nums)
-    primes = sieve_of_eratosthenes(max_n)
-    
-    def game_winner(n):
-        """
-        . Determine winner for a single game with n .
-        """
-        count = sum(1 for i in range(2, n + 1) if primes[i])
-        return "Maria" if count % 2 == 1 else "Ben"
-    
-    maria_wins = sum(1 for n in nums if game_winner(n) == "Maria")
-    ben_wins = x - maria_wins
-    
+
+    ben_wins, maria_wins = 0, 0
+    primes = [1] * (max(nums) + 1)
+    primes[0], primes[1] = 0, 0
+
+    for i in range(2, len(primes)):
+        mark_multiples(primes, i)
+
+    for num in nums:
+        if sum(primes[:num + 1]) % 2 == 0:
+            ben_wins += 1
+        else:
+            maria_wins += 1
+
+    if ben_wins > maria_wins:
+        return "Ben"
     if maria_wins > ben_wins:
         return "Maria"
-    elif ben_wins > maria_wins:
-        return "Ben"
-    else:
-        return None
+    return None
 
+def mark_multiples(prime_list, prime):
+    """
+    Marks multiples of a prime as non-prime.
+
+    Args:
+        prime_list (list): List of potential primes.
+        prime (int): The prime number.
+    """
+    for i in range(2, len(prime_list)):
+        try:
+            prime_list[i * prime] = 0
+        except IndexError:
+            break
